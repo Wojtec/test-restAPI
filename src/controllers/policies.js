@@ -1,5 +1,5 @@
-const get = (req, res, next) => {
-    res.send('ppppp')
+const get = (req, res) => {
+    res.send('saasd');
 }
 
 module.exports = {
