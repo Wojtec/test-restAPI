@@ -2,7 +2,7 @@ const fetch = require("node-fetch");
 
 const CLIENT_URL = "https://dare-nodejs-assessment.herokuapp.com/api/";
 
-
+//Client credentials
 const data = JSON.stringify({
         client_id: "axa",
         client_secret: "s3cr3t"
@@ -10,6 +10,7 @@ const data = JSON.stringify({
 
 let TOKEN_API = {}
 
+//Get API token
 const loginApi = async() =>{
     try{
         const response = await fetch(CLIENT_URL + 'login', {
@@ -20,33 +21,52 @@ const loginApi = async() =>{
             body: data
         })
         const content = await response.json();
-    
-        TOKEN_API = content.token;
-        console.log(TOKEN_API);
+        return TOKEN_API = content.token;
+
     }catch(err){
-        console.log(err);
+        console.error(err);
     }
     
 }
+
+//Get policies data
 const getPolicies = async () => {
-    const token  = TOKEN_API;
-    console.log(token);
     try{
         const response = await fetch(CLIENT_URL + 'policies', {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
-                "authorization": 'Bearer ' + token
+                "authorization": 'Bearer ' + TOKEN_API
             },
         })
         const content = await response.json();
         return content;
+
     }catch(err) {
-        console.log(err);
+        console.error(err);
+    }
+}
+
+//Get clients data
+const getClients = async () => {
+    try{
+        const response = await fetch(CLIENT_URL + 'clients', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                "authorization": 'Bearer ' + TOKEN_API
+            },
+        })
+        const content = await response.json();
+        return content;
+
+    }catch(err) {
+        console.error(err);
     }
 }
 
 module.exports = {
     loginApi,
-    getPolicies
+    getPolicies,
+    getClients
 }
