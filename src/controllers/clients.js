@@ -31,7 +31,6 @@ const getClientsData = async (req, res) => {
     
           return  res.status(200).json(data);
         }
-
     }catch(err){
         console.error(err);
     }
@@ -76,7 +75,7 @@ const getClientsById = async (req, res) => {
             const findClientById =  dataClient.find(c => c.id === id);
 
             if(!findClientById) return res.status(404).send({message: "Not Found error."});
-            
+
             if(findClientById) {
                 const policies = []
                 const findPoliciesById =  dataPolicies.filter(c => c.clientId === id);
@@ -92,6 +91,57 @@ const getClientsById = async (req, res) => {
                 return res.status(200).json(clientData);
             }   
         }   
+    }catch(err){
+        console.error(err);
+    }
+}
+
+//Get policies by client Id example URL:/api/v1/clients/a74c83c5-e271-4ecf-a429-d47af952cfd4/policies
+const getPoliciesByClientId = async (req, res) => {
+    try{
+        const { role } = req.user;
+        const { id } = req.params;
+        const dataClient = await getClients();
+        const dataPolicies = await getPolicies();
+        if(role === "user"){
+            const dataByRole = dataClient.filter(user => user.role === role);
+            if(!dataByRole) return res.status(404).send({message: "Not Found error."});
+            if(dataByRole){
+                const policies = [];
+                const getClientById = dataByRole.find(user => user.id === id);
+                const getPoliciesByClientId = dataPolicies.filter(policies => policies.clientId === getClientById.id);
+                getPoliciesByClientId.map(policie => {
+                    policies.push({
+                        "id": policie.id,
+                        "amountInsured": policie.amountInsured,
+                        "email": policie.email,
+                        "inceptionDate": policie.inceptionDate,
+                        "installmentPayment": policie.installmentPayment
+                    })
+                })
+                return res.status(200).send(policies);
+
+            }
+        }
+
+        if(role === "admin"){
+            const getClientById = dataClient.find(user => user.id === id);
+            if(!getClientById) return res.status(404).send({message: "Not Found error."});
+            if(getClientById){
+                const policies = [];
+                const getPoliciesByClientId = dataPolicies.filter(policies => policies.clientId === getClientById.id);
+                getPoliciesByClientId.map(policie => {
+                    policies.push({
+                        "id": policie.id,
+                        "amountInsured": policie.amountInsured,
+                        "email": policie.email,
+                        "inceptionDate": policie.inceptionDate,
+                        "installmentPayment": policie.installmentPayment
+                    })
+                })
+              return res.status(200).send(policies);
+            }
+        }
 
     }catch(err){
         console.error(err);
@@ -101,5 +151,6 @@ const getClientsById = async (req, res) => {
 
 module.exports = {
     getClientsData,
-    getClientsById
+    getClientsById,
+    getPoliciesByClientId
 }

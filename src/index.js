@@ -2,7 +2,7 @@ const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
 
-const { getClientsData, getClientsById } = require('./controllers/clients');
+const { getClientsData, getClientsById, getPoliciesByClientId } = require('./controllers/clients');
 const { getPoliciesData, getPoliciesById } = require('./controllers/policies');
 const { verifyToken } = require('./authServer');
 
@@ -17,6 +17,7 @@ app.use('/api/v1/policies/:id',verifyToken,getPoliciesById)
 app.use('/api/v1/policies',verifyToken,getPoliciesData)
 
 //Clients routes
+app.use('/api/v1/clients/:id/policies',verifyToken,getPoliciesByClientId)
 app.use('/api/v1/clients/:id',verifyToken,getClientsById)
 app.use('/api/v1/clients',verifyToken,getClientsData)
 

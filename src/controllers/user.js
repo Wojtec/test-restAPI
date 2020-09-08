@@ -11,7 +11,6 @@ const verifyUser = async ({ username, password }) => {
     }catch(err) {
         console.error(err);
     }
-
 } 
 
 module.exports = {

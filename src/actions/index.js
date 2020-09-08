@@ -11,7 +11,7 @@ const data = JSON.stringify({
 let TOKEN_API = {}
 
 //Get API token
-const loginApi = async() =>{
+const loginApi = async () =>{
     try{
         const response = await fetch(CLIENT_URL + 'login', {
             method: 'POST',

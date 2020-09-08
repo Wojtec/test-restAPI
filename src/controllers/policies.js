@@ -1,6 +1,5 @@
 const { getPolicies }= require('../actions');
 
-
 // Get policies with query limit example: /api/v1/policies?limit=10
 const getPoliciesData = async (req, res) => {
     try{
@@ -18,7 +17,7 @@ const getPoliciesById = async (req, res) => {
     try{
         const { id } = req.params;
         const data = await getPolicies();
-        const findById =  data.find(p => p.id === id);
+        const findById = data.find(p => p.id === id);
         if(findById) {
             res.status(200).json(findById);
         }

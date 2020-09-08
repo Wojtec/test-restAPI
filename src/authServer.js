@@ -11,44 +11,55 @@ app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 
 const generateAccessToken = async (user) => {
-    const exp = Math.floor(Date.now() / 1000) + (60 * 60);
-    const token = jwt.sign(user, config.secret,{
-        algorithm: 'HS256',
-        expiresIn: exp 
-    });
-
-    return {token, type:"Bearer", expiresIn: exp };
+    try{
+        const exp = Math.floor(Date.now() / 1000) + (60 * 60);
+        const token = jwt.sign(user, config.secret,{
+            algorithm: 'HS256',
+            expiresIn: exp 
+        });
+       return {token, type:"Bearer", expiresIn: exp };
+    }catch(err){
+        console.error(err);
+    }
 }
 
 const verifyToken = async (req, res, next) => {
-    const bearerHeader = req.headers['authorization'];
-    const token = bearerHeader && bearerHeader.split(' ')[1];
+    try{
+        const bearerHeader = req.headers['authorization'];
+        const token = bearerHeader && bearerHeader.split(' ')[1];
 
-    if(token == null) return res.sendStatus(401);
-
-    jwt.verify(token, config.secret, (err, user) => {
-        if(err) return res.sendStatus(403);
-        req.user = user;
-  
-    })
+        if(token == null) return res.sendStatus(401);
     
-    await loginApi();
-    next();
+        jwt.verify(token, config.secret, (err, user) => {
+            if(err) return res.sendStatus(401);
+            req.user = user;
+      
+        })
+    
+        await loginApi();
+        next();
+    }catch(err){
+        next(err);
+    }
 }
 
 const login = async (req, res, next) => {
-    const data = req.body;
-    const user = await verifyUser(data);
-
-    if(!user) res.status(400).send({message: "Username or password is not valid."});
+    try{
+        const data = req.body;
+        const user = await verifyUser(data);
     
-    if(user){
-        const { onlyUser } = user;
-        const accessToken = await generateAccessToken(onlyUser);
-        const {token, type} = accessToken;
-        res.header("Authorization",token).send(accessToken);
+        if(!user) res.status(400).send({message: "Username or password is not valid."});
+        
+        if(user){
+            const { onlyUser } = user;
+            const accessToken = await generateAccessToken(onlyUser);
+            const {token, type} = accessToken;
+            return res.header("Authorization",token).send(accessToken);
+        }
+        next();
+    }catch(err){
+        next(err);
     }
-    next();    
 }
 
 app.use('/api/v1/login',login,loginApi);
