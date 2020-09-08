@@ -36,15 +36,18 @@ const verifyToken = (req, res, next) => {
 const login = async (req, res, next) => {
     const data = req.body;
     const user = await verifyUser(data);
-    const { username } = user;
-    const accessToken = await generateAccessToken(username);
-    const refreshToken = jwt.sign(username, config.secret)
-    const {token, type} = accessToken;
-    res.header("Authorization",token).send(accessToken);
-
-    next();
+    if(!user) {
+        res.status(400).send({message: "Username or password is not valid."})
+    }
+    if(user){
+        const { username } = user;
+        const accessToken = await generateAccessToken(username);
+        const refreshToken = jwt.sign(username, config.secret)
+        const {token, type} = accessToken;
+        res.header("Authorization",token).send(accessToken);
     
-   
+        next();    
+    }
 }
 
 
