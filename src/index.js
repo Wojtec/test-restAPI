@@ -2,9 +2,9 @@ const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
 
-const { getClientsData, getClientsById, getPoliciesByClientId } = require('./controllers/clients');
-const { getPoliciesData, getPoliciesById } = require('./controllers/policies');
-const { verifyToken } = require('./authServer');
+//Routes
+const policiesRoutes = require('./routes/policies');
+const clientRoutes = require('./routes/clients');
 
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }))
@@ -13,13 +13,10 @@ app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 
 //Policies routes
-app.use('/api/v1/policies/:id',verifyToken,getPoliciesById)
-app.use('/api/v1/policies',verifyToken,getPoliciesData)
+app.use('/api/v1/policies', policiesRoutes)
 
 //Clients routes
-app.use('/api/v1/clients/:id/policies',verifyToken,getPoliciesByClientId)
-app.use('/api/v1/clients/:id',verifyToken,getClientsById)
-app.use('/api/v1/clients',verifyToken,getClientsData)
+app.use('/api/v1/clients', clientRoutes)
 
 const PORT = process.env.PORT || 3000;
 

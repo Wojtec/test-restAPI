@@ -9,7 +9,9 @@ const getClientsData = async (req, res) => {
         const { role } = req.user;
         const { limit, name } = req.query;
         const data = await getClients();
-    
+
+        if(!role) return res.status(401).send({message: 'Unauthorized error'})
+
         if(role === "user"){
             const dataByRole = data.filter(user => user.role === role);
             
@@ -44,11 +46,13 @@ const getClientsById = async (req, res) => {
         const dataClient = await getClients();
         const dataPolicies = await getPolicies();
 
+        if(!role) return res.status(401).send({message: 'Unauthorized error'})
+
         if(role === "user"){
             const dataByRole = dataClient.filter(user => user.role === role);
-
-            if(!dataByRole) return res.status(404).send({message: "Not Found error."});
             
+            if(!dataByRole) return res.status(404).send({message: "Not Found error."});
+
             if(dataByRole){
                 const findClientById =  dataByRole.find(c => c.id === id);
 
@@ -73,9 +77,9 @@ const getClientsById = async (req, res) => {
 
         if(role === "admin"){
             const findClientById =  dataClient.find(c => c.id === id);
-
+            
             if(!findClientById) return res.status(404).send({message: "Not Found error."});
-
+            
             if(findClientById) {
                 const policies = []
                 const findPoliciesById =  dataPolicies.filter(c => c.clientId === id);
@@ -103,33 +107,47 @@ const getPoliciesByClientId = async (req, res) => {
         const { id } = req.params;
         const dataClient = await getClients();
         const dataPolicies = await getPolicies();
+
+        if(!role) return res.status(401).send({message: 'Unauthorized error'})
+
         if(role === "user"){
             const dataByRole = dataClient.filter(user => user.role === role);
+           
             if(!dataByRole) return res.status(404).send({message: "Not Found error."});
+           
             if(dataByRole){
                 const policies = [];
                 const getClientById = dataByRole.find(user => user.id === id);
-                const getPoliciesByClientId = dataPolicies.filter(policies => policies.clientId === getClientById.id);
-                getPoliciesByClientId.map(policie => {
-                    policies.push({
-                        "id": policie.id,
-                        "amountInsured": policie.amountInsured,
-                        "email": policie.email,
-                        "inceptionDate": policie.inceptionDate,
-                        "installmentPayment": policie.installmentPayment
-                    })
-                })
-                return res.status(200).send(policies);
 
+                if(!getClientById) return res.status(404).send({message: "Not Found error."});
+
+                if(getClientById){
+                    const getPoliciesByClientId = dataPolicies.filter(policies => policies.clientId === getClientById.id);
+                    
+                    getPoliciesByClientId.map(policie => {
+                        policies.push({
+                            "id": policie.id,
+                            "amountInsured": policie.amountInsured,
+                            "email": policie.email,
+                            "inceptionDate": policie.inceptionDate,
+                            "installmentPayment": policie.installmentPayment
+                        })
+                    })
+
+                    return res.status(200).send(policies);
+                }
             }
         }
 
         if(role === "admin"){
             const getClientById = dataClient.find(user => user.id === id);
+            
             if(!getClientById) return res.status(404).send({message: "Not Found error."});
+           
             if(getClientById){
                 const policies = [];
                 const getPoliciesByClientId = dataPolicies.filter(policies => policies.clientId === getClientById.id);
+                
                 getPoliciesByClientId.map(policie => {
                     policies.push({
                         "id": policie.id,
@@ -139,6 +157,7 @@ const getPoliciesByClientId = async (req, res) => {
                         "installmentPayment": policie.installmentPayment
                     })
                 })
+
               return res.status(200).send(policies);
             }
         }
@@ -147,7 +166,6 @@ const getPoliciesByClientId = async (req, res) => {
         console.error(err);
     }
 }
-
 
 module.exports = {
     getClientsData,

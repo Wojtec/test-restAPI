@@ -6,7 +6,7 @@ const getPoliciesData = async (req, res) => {
         const { limit } = req.query;
         const data = await getPolicies();
         const limitData = data.slice(0, limit || 10);
-        res.status(200).json(limitData);
+        return res.status(200).json(limitData);
     }catch(err){
         console.error(err);
     }
@@ -18,8 +18,11 @@ const getPoliciesById = async (req, res) => {
         const { id } = req.params;
         const data = await getPolicies();
         const findById = data.find(p => p.id === id);
+       
+        if(!findById) return res.status(404).send({message: 'Not Found error'})
+       
         if(findById) {
-            res.status(200).json(findById);
+           return res.status(200).json(findById);
         }
     }catch(err){
         console.error(err);

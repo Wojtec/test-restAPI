@@ -10,7 +10,7 @@ app.use(bodyParser.urlencoded({ extended: false }))
 // parse application/json
 app.use(bodyParser.json())
 
-const generateAccessToken = async (user) => {
+const generateAccessToken = (user) => {
     try{
         const exp = Math.floor(Date.now() / 1000) + (60 * 60);
         const token = jwt.sign(user, config.secret,{
@@ -43,24 +43,25 @@ const verifyToken = async (req, res, next) => {
     }
 }
 
-const login = async (req, res, next) => {
+const login = (req, res, next) => {
     try{
         const data = req.body;
-        const user = await verifyUser(data);
+        const user = verifyUser(data);
     
         if(!user) res.status(400).send({message: "Username or password is not valid."});
         
         if(user){
-            const { onlyUser } = user;
-            const accessToken = await generateAccessToken(onlyUser);
-            const {token, type} = accessToken;
+            const accessToken = generateAccessToken(user);
+            const {token} = accessToken;
             return res.header("Authorization",token).send(accessToken);
         }
+
         next();
     }catch(err){
         next(err);
     }
 }
+
 
 app.use('/api/v1/login',login,loginApi);
 
