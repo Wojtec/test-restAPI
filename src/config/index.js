@@ -1,3 +1,3 @@
 module.exports = {
-    'secret': 'cookie'
+    'secret': process.env.JWT_SECRET
 };

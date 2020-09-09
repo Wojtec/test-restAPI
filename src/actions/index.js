@@ -1,11 +1,11 @@
 const fetch = require("node-fetch");
 
-const CLIENT_URL = "https://dare-nodejs-assessment.herokuapp.com/api/";
+const CLIENT_URL = process.env.CLIENT_URL;
 
 //Client credentials
 const data = JSON.stringify({
-        client_id: "axa",
-        client_secret: "s3cr3t"
+        client_id: process.env.CLIENT_ID,
+        client_secret: process.env.CLIENT_SECRET
 })
 
 let TOKEN_API = {}
