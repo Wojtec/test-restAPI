@@ -1,5 +1,8 @@
 const fetch = require("node-fetch");
+const fs = require('fs').promises;
+const jwt = require('jsonwebtoken');
 
+//Client URL
 const CLIENT_URL = process.env.CLIENT_URL;
 
 //Client credentials
@@ -8,9 +11,27 @@ const data = JSON.stringify({
         client_secret: process.env.CLIENT_SECRET
 })
 
-let TOKEN_API = {}
+//Read token from file authData.json
+const readToken = async () => {
+  const readFile = await fs.readFile('./authData.json');
+  const data = JSON.parse(readFile);
+  return data.token;
+}
 
-//Get API token
+//Check if API token is expired
+const refreshToken = async (token) => {
+    const decodeToken =  jwt.decode(token, {complete: true})
+    const { payload } = decodeToken;
+
+    if (Date.now() >= payload.exp * 1000) {
+            await loginApi();
+            return await readToken();
+    } else {
+        return token;
+    }
+}
+
+//Get API token and write in file authData.json
 const loginApi = async () =>{
     try{
         const response = await fetch(CLIENT_URL + 'login', {
@@ -21,47 +42,57 @@ const loginApi = async () =>{
             body: data
         })
         const content = await response.json();
-        return TOKEN_API = content.token;
+
+        return await fs.writeFile('./authData.json', JSON.stringify(content), 'utf8');
 
     }catch(err){
-        console.error(err);
+        console.log(err);
     }
-    
 }
 
 //Get policies data
 const getPolicies = async () => {
     try{
-        const response = await fetch(CLIENT_URL + 'policies', {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                "authorization": 'Bearer ' + TOKEN_API
-            },
-        })
-        const content = await response.json();
-        return content;
+        const getToken = await readToken();
+        const freshToken = await refreshToken(getToken);
+        
+        if(freshToken){
+            const response = await fetch(CLIENT_URL + 'policies', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    "authorization": 'Bearer ' + freshToken
+                },
+            })
 
+            const content = await response.json();
+            return content;
+        }
     }catch(err) {
-        console.error(err);
+        console.log(err);
     }
 }
 
 //Get clients data
 const getClients = async () => {
     try{
-        const response = await fetch(CLIENT_URL + 'clients', {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                "authorization": 'Bearer ' + TOKEN_API
-            },
-        })
-        const content = await response.json();
-        return content;
+        const getToken = await readToken();
+        const freshToken = await refreshToken(getToken);
+        
+        if(freshToken) {
+            const response = await fetch(CLIENT_URL + 'clients', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    "authorization": 'Bearer ' + freshToken
+                },
+            })
 
+            const content = await response.json();
+            return content;
+        }
     }catch(err) {
-        console.error(err);
+        console.log(err);
     }
 }
 

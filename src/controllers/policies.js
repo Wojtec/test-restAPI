@@ -1,19 +1,19 @@
 const { getPolicies }= require('../actions');
 
 // Get policies with query limit example: /api/v1/policies?limit=10
-const getPoliciesData = async (req, res) => {
+const getPoliciesData = async (req, res, next) => {
     try{
         const { limit } = req.query;
         const data = await getPolicies();
         const limitData = data.slice(0, limit || 10);
         return res.status(200).json(limitData);
     }catch(err){
-        console.error(err);
+        next(err);
     }
 }
 
 // Get policies by Id example:/api/v1/policies/e8fd159b-57c4-4d36-9bd7-a59ca13057bb
-const getPoliciesById = async (req, res) => {
+const getPoliciesById = async (req, res, next) => {
     try{
         const { id } = req.params;
         const data = await getPolicies();
@@ -25,7 +25,7 @@ const getPoliciesById = async (req, res) => {
            return res.status(200).json(findById);
         }
     }catch(err){
-        console.error(err);
+        next(err);
     }
 }
 

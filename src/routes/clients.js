@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 const { getClientsData, getClientsById, getPoliciesByClientId } = require('../controllers/clients');
-const { verifyToken } = require('../authServer');
+const { verifyToken } = require('../auth');
 
 //Clients routes
 router.get('/:id/policies',verifyToken,getPoliciesByClientId)

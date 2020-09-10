@@ -4,7 +4,7 @@ const { getPolicies }= require('../actions');
 
 
 //Get clients by roles and filter by query limit and name example URL:/api/v1/clients?limit=5&name=Manning
-const getClientsData = async (req, res) => {
+const getClientsData = async (req, res, next) => {
     try{
         const { role } = req.user;
         const { limit, name } = req.query;
@@ -34,12 +34,12 @@ const getClientsData = async (req, res) => {
           return  res.status(200).json(data);
         }
     }catch(err){
-        console.error(err);
+        next(err);
     }
 }
 
 //Get clients by roles and by ID with policies example URL: /api/v1/clients/a0ece5db-cd14-4f21-812f-966633e7be86
-const getClientsById = async (req, res) => {
+const getClientsById = async (req, res, next) => {
     try{
         const { role } = req.user;
         const { id } = req.params;
@@ -96,12 +96,12 @@ const getClientsById = async (req, res) => {
             }   
         }   
     }catch(err){
-        console.error(err);
+        next(err);
     }
 }
 
 //Get policies by client Id example URL:/api/v1/clients/a74c83c5-e271-4ecf-a429-d47af952cfd4/policies
-const getPoliciesByClientId = async (req, res) => {
+const getPoliciesByClientId = async (req, res, next) => {
     try{
         const { role } = req.user;
         const { id } = req.params;
@@ -163,7 +163,7 @@ const getPoliciesByClientId = async (req, res) => {
         }
 
     }catch(err){
-        console.error(err);
+        next(err);
     }
 }
 
