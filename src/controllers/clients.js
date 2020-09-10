@@ -15,10 +15,12 @@ const getClientsData = async (req, res, next) => {
         if(role === "user"){
             const dataByRole = data.filter(user => user.role === role);
             
+            
             if(limit || name ){
                 const findByName = name ? dataByRole.filter(user => user.name === name) : dataByRole;
                 const limitData = findByName ? findByName.slice(0, limit) : dataByRole.slice(0, limit);
-               return res.status(200).json(limitData);
+               
+                return res.status(200).json(limitData);
             }
     
            return res.status(200).json(dataByRole);
@@ -28,6 +30,7 @@ const getClientsData = async (req, res, next) => {
             if(limit || name ){
                 const findByName = name ? data.filter(user => user.name === name) : data;
                 const limitData = findByName ? findByName.slice(0, limit) : data.slice(0, limit);
+
                return res.status(200).json(limitData);
             }
     

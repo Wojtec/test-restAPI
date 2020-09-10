@@ -6,7 +6,9 @@ const getPoliciesData = async (req, res, next) => {
         const { limit } = req.query;
         const data = await getPolicies();
         const limitData = data.slice(0, limit || 10);
+
         return res.status(200).json(limitData);
+        
     }catch(err){
         next(err);
     }
