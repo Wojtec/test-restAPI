@@ -16,15 +16,15 @@ const verifyToken = (req, res, next) => {
     try{
         const bearerHeader = req.headers['authorization'];
         const token = bearerHeader && bearerHeader.split(' ')[1];
-
         if(!token) return res.status(401).send({message: 'Unauthorized'});
        
         if(token){
             jwt.verify(token, config.secret, (err, user) => {
                 if(err) return res.status(401).send({message: 'Token is not valid'});
-                req.user = user;
-                next();
+                return req.user = user;
             })
+            next();
+
         }
         
     }catch(err){
@@ -37,7 +37,7 @@ const login = (req, res, next) => {
         const data = req.body;
         const user = verifyUser(data);
     
-        if(!user) res.status(400).send({message: "Username or password is not valid."});
+        if(!user) res.status(401).send({message: "Username or password is not valid."});
         
         if(user){
             const accessToken = generateAccessToken(user);

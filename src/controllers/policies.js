@@ -3,12 +3,16 @@ const { getPolicies }= require('../actions');
 // Get policies with query limit example: /api/v1/policies?limit=10
 const getPoliciesData = async (req, res, next) => {
     try{
+        let policies = [];
         const { limit } = req.query;
         const data = await getPolicies();
         const limitData = data.slice(0, limit || 10);
+        limitData.map(p => {
+            const { clientId, ...withoutClientId } = p;
+            return policies.push(withoutClientId)
+        })
+        return res.status(200).json(policies);
 
-        return res.status(200).json(limitData);
-        
     }catch(err){
         next(err);
     }
