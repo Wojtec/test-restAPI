@@ -23,7 +23,7 @@ In your terminal:
 
 ```
 git clone https://github.com/Wojtec/test-restAPI.git
-
+```
 
 ## Run application
 
@@ -33,9 +33,11 @@ Make sure that you are in correct path `/test-restAPI#`  in your terminal and wr
 
 ```
 npm install
+```
 
 ```
 npm start
+```
 
 Server should be listening on `http://localhost:3000`
 
@@ -62,7 +64,7 @@ Retrieve the auth token.
 
 ```
 POST /api/v1/login
-
+```
 
 This endpoint will allow for the user login to the application and recive token if veryfication will be valid.
 
@@ -168,7 +170,7 @@ Get the list of policies' client paginated and limited to 10 elements by default
 
 ```
 Get /api/v1/policies
-
+```
 
 This endpoint will allow for the user recive policies data.
 
@@ -219,6 +221,7 @@ Get the details of a policy's client.
 
 ```
 Get /api/v1/policies/:id
+```
 
 This endpoint will allow for the user recive client policy details.
 
