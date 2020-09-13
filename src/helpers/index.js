@@ -1,4 +1,4 @@
-const { loginApi } = require('../actions');
+const  actions  = require('../actions');
 const jwt = require('jsonwebtoken');
 const fs = require('fs').promises;
 
@@ -8,8 +8,8 @@ const readToken = async () => {
     try{
     const readFile = await fs.readFile('./apiData.json');
     const data = JSON.parse(readFile);
-
-    return data.token;
+    const { token } = data;
+    return token;
 
     }catch(err){
         console.error(err);
@@ -24,8 +24,9 @@ const refreshToken = async (token) => {
 
         if (Date.now() >= payload.exp * 1000) {
 
-            loginApi;
-            return await readToken();
+        const newToken = await actions.loginApi();
+        
+        return newToken;
 
         } else {
 

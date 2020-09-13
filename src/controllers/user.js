@@ -1,4 +1,4 @@
-const { generateAccessToken } = require('../auth');
+const { generateAccessToken } = require('../services/auth');
 
 const clients = [{id:1, username: "test", password: 'test', role: 'user'},{id:2, username: "test2", password: 'test2', role: 'admin'}];
 
