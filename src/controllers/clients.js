@@ -91,21 +91,21 @@ const getClientsById = async (req, res, next) => {
 
             if(!findClientById) return res.status(404).send({message: "Not Found error."});
 
-                const policies = []
-                const findPoliciesById =  dataPolicies.filter(c => c.clientId === id);
+            const policies = []
+            const findPoliciesById =  dataPolicies.filter(c => c.clientId === id);
 
-                findPoliciesById.map(p => {
+            findPoliciesById.map(p => {
 
-                    policies.push({
-                        "id" : p.id,
-                        "amountInsured" : p.amountInsured,
-                        "inceptionDate": p.inceptionDate
-                    })
+                policies.push({
+                    "id" : p.id,
+                    "amountInsured" : p.amountInsured,
+                    "inceptionDate": p.inceptionDate
                 })
+            })
 
-                findClientById.policies = [...policies];
-                const clientData = Object.assign([findClientById]);
-                return res.status(200).json(clientData);
+            findClientById.policies = [...policies];
+            const clientData = Object.assign([findClientById]);
+            return res.status(200).json(clientData);
         }
 
         if(role === "admin"){

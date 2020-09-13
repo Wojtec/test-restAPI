@@ -43,6 +43,67 @@ Server should be listening on `http://localhost:3000`
 
 To use application you will need some API testing tool for example `Postman` Available on [Postman](https://docs.api.getpostman.com/)
 
+## Tests
+
+To run tests make sure that you have Jest and supertest installed in your devDependiency.
+
+Start test writing in your terminal:
+
+```
+npm test
+```
+
+Test includes :
+8 unit tests
+
+````csharp
+    Verify User
+      ✓ Unit test for verify user (31 ms)
+    Auth middleware
+      ✓ should populate req.user with token (9 ms)
+      ✓ should return catch error (1 ms)
+    Consuming API
+      ✓ readToken function reading token from file (23 ms)
+      ✓ Should handle a readFile error from readToken (1 ms)
+      ✓ refreshToken function checking if token is still valid (1 ms)
+      ✓ Should handle a refreshToken catch error (1 ms)
+      ✓ Should handle a loginApi catch error (329 ms)
+
+````
+21 integration tests
+
+````csharp
+ Endpoints tests
+    GET /api/v1/login
+      ✓ Should return token (70 ms)
+      ✓ Should return 401 username or password not valid (11 ms)
+    GET /api/v1/policies
+      ✓ Should return all policies 10 by default (438 ms)
+      ✓ Should return 401 Unauthorized error. (3 ms)
+      ✓ Should return 401 Unauthorized error.Token is not valid (2 ms)
+      ✓ Should return policies limited by query string (453 ms)
+      ✓ Should return policies matched to object schema (304 ms)
+    GET /api/v1/policies/:id
+      ✓ Should return policie by id (252 ms)
+      ✓ Should return 401 Unauthorized (9 ms)
+      ✓ Should return 404 Not Found error (249 ms)
+    GET /api/v1/clients
+      ✓ Should return 10 elements by default and status 200 (588 ms)
+      ✓ Should return elements limited by query string (607 ms)
+      ✓ Should return elements by name query string (476 ms)
+      ✓ Should return elements by name and limit query string (475 ms)
+      ✓ Should return 401 unauthorized error (3 ms)
+    GET /api/v1/clients/:id
+      ✓ Should return client's details by id (685 ms)
+      ✓ Should return 401 unauthorized error (11 ms)
+      ✓ Should return 404 not Found error (469 ms)
+      ✓ Should return client's policies (774 ms)
+      ✓ Should return 401 unauthorized error (8 ms)
+      ✓ Should return 404 not Found error (8 ms)
+
+````
+I didn't make automation tests because I don't use UI.
+
 ## Endpoints
 
 #CLIENT_CREDENTIALS 
