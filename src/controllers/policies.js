@@ -1,5 +1,13 @@
 const { getPolicies }= require('../actions');
 
+
+/**
+ * 
+ * POLICIES CONTROLLERS
+ * 
+ **/
+
+
 // Get policies with query limit example: /api/v1/policies?limit=10
 const getPoliciesData = async (req, res, next) => {
     try{

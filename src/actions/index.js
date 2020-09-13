@@ -2,6 +2,13 @@ const fetch = require("node-fetch");
 const fs = require('fs').promises;
 const { readToken, refreshToken } = require('../helpers')
 
+/**
+ * 
+ * ACTIONS FOR API INTEGRATION
+ * 
+ **/
+
+
 //Client URL
 const CLIENT_URL = process.env.CLIENT_URL || "https://dare-nodejs-assessment.herokuapp.com/api/";
 
@@ -23,7 +30,8 @@ const loginApi = async () =>{
             body: CLIENT_CREDENTIALS
         })
         const content = await response.json();
-       await fs.writeFile('./apiData.json', JSON.stringify(content), 'utf8');
+        
+        await fs.writeFile('./apiData.json', JSON.stringify(content), 'utf8');
 
        return content.token;
 

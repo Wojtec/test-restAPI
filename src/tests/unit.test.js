@@ -30,7 +30,7 @@ describe('Unit tests', () => {
             token = generateAccessToken(user);
         })
     
-        it('should populate req.user with token', () => {
+        it('Should populate req.user with token', () => {
             const req = {
                 headers: { authorization: 'Bearer ' + token.token }
             };
@@ -48,7 +48,7 @@ describe('Unit tests', () => {
             })
         })
        
-        it('should return catch error', () => {
+        it('Should return catch error from verifyToken', () => {
           try{
             const req = {
                 headers: { authorization: 'Bearer ' + null }
@@ -57,6 +57,7 @@ describe('Unit tests', () => {
             const next = jest.fn();
     
             verifyToken(req, res, next);
+            
           }catch(e){
             expect(next(e)).toEqual({
                 error: e,
@@ -66,10 +67,9 @@ describe('Unit tests', () => {
     })
     
     describe('Consuming API', () => {
-
     
         it('readToken function reading token from file', async () => {
-            expect.assertions(2);
+
                 await helpers.readToken().then(res => {
                     expect(res).toEqual(expect.any(String))
                     expect(res.length).toBe(151)
@@ -92,17 +92,6 @@ describe('Unit tests', () => {
             jest.restoreAllMocks();
 
           });
-
-        it('refreshToken function checking if token is still valid', async () => {
-
-            expect.assertions(2);
-                await helpers.refreshToken(token).then(res => {
-                    expect(res).toEqual(expect.any(String))
-                    expect(res.length).toBe(151)
-
-                })
-
-        })
 
         it('Should handle a refreshToken catch error', async () => {
 

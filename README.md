@@ -13,7 +13,12 @@
 
 * Configuration of a linter and some specific rules to maintain code coherence style. For example https://github.com/airbnb/javascript/tree/master/packages/eslint-config-airbnb-base.
 
+## Contact
 
+If you have any questions about project you can contact with me by email.
+
+Email: `poninski.w@gmail.com`
+Name: `Wojtek`
 
 ## Installation
 
@@ -54,7 +59,7 @@ npm test
 ```
 
 Test includes :
-8 unit tests
+7 unit tests
 
 ````csharp
     Verify User
@@ -65,7 +70,6 @@ Test includes :
     Consuming API
       ✓ readToken function reading token from file (23 ms)
       ✓ Should handle a readFile error from readToken (1 ms)
-      ✓ refreshToken function checking if token is still valid (1 ms)
       ✓ Should handle a refreshToken catch error (1 ms)
       ✓ Should handle a loginApi catch error (329 ms)
 

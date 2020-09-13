@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": " jest src/tests/unit.test.js --watch --verbose ",
+    "test": " jest --watch --verbose ",
     "start": "node src/"
   },
   "repository": {

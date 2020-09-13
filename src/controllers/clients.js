@@ -2,6 +2,13 @@ const { getClients } = require('../actions');
 const { getPolicies }= require('../actions');
 
 
+/**
+ * 
+ * CLIENT CONTROLLERS
+ * 
+ **/
+
+
 //Get clients by roles and filter by query limit and name example URL:/api/v1/clients?limit=5&name=Manning
 const getClientsData = async (req, res, next) => {
     try{

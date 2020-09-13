@@ -1,5 +1,11 @@
 const { generateAccessToken } = require('../services/auth');
 
+/**
+ * 
+ * USER CONTROLLERS
+ * 
+ **/
+
 const clients = [{id:1, username: "test", password: 'test', role: 'user'},{id:2, username: "test2", password: 'test2', role: 'admin'}];
 
 //Verify user with clients normal will be data base
@@ -12,6 +18,7 @@ const verifyUser = ({ username, password }) => {
         return onlyUser;
     }
 } 
+
 //login user with verification and function to generate access token
 const login = (req, res, next) => {
     try{

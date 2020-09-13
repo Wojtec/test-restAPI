@@ -5,6 +5,12 @@ let TOKEN = '';
 
 describe('Endpoints tests', () => {
 
+    /**
+     *  
+     *  TEST LOGIN ROUTE
+     * 
+     **/
+
     describe('GET /api/v1/login', () => {
 
         it('Should return token',async (done) => {
@@ -39,6 +45,12 @@ describe('Endpoints tests', () => {
         })
 
     })
+
+     /**
+     *  
+     *  TEST POLICIES ROUTE
+     * 
+     **/
 
     describe('GET /api/v1/policies', () => {
 
@@ -147,6 +159,12 @@ describe('Endpoints tests', () => {
         })
 
     })
+
+     /**
+     *  
+     *  TEST CLIENTS ROUTE
+     * 
+     **/
 
     describe('GET /api/v1/clients', () => {
 

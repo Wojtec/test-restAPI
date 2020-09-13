@@ -1,6 +1,15 @@
 const config = require('../config');
 const jwt = require('jsonwebtoken');
 
+/**
+ *  
+ * AUTHORIZATION SERVICE
+ * 
+ * 1.Function generateAccessToken create new token with user payload.
+ * 2.Function verifyToken is checking Authorization header and verifying token
+ * 
+ **/
+
 //Generate access token
 const generateAccessToken = (user) => {
     const exp = Math.floor(Date.now() / 1000) + (60 * 60);

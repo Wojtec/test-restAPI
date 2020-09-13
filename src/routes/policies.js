@@ -1,6 +1,12 @@
 const express = require('express');
 const router = express.Router();
 
+/**
+ *  
+ * POLICIES ROUTES
+ * 
+ **/
+
 const { getPoliciesData, getPoliciesById } = require('../controllers/policies');
 const { verifyToken } = require('../services/auth');
 
