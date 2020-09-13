@@ -1,7 +1,7 @@
 const request = require('supertest');
 const app = require('../app');
  
-let TOKEN = '';
+let TOKEN;
 
 describe('Endpoints tests', () => {
 
