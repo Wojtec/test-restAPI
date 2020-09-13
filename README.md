@@ -172,7 +172,6 @@ Get the list of policies' client paginated and limited to 10 elements by default
 Get /api/v1/policies
 ```
 
-
 This endpoint will allow for the user recive policies data.
 
 ````csharp
