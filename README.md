@@ -24,7 +24,7 @@ In your terminal:
 ```
 git clone https://github.com/Wojtec/test-restAPI.git
 
-
+```
 ## Run application
 
 Open project in your code editor and install all dependencies
@@ -33,9 +33,11 @@ Make sure that you are in correct path `/test-restAPI#`  in your terminal and wr
 
 ```
 npm install
+```
 
 ```
 npm start
+```
 
 Server should be listening on `http://localhost:3000`
 
@@ -62,7 +64,7 @@ Retrieve the auth token.
 
 ```
 POST /api/v1/login
-
+```
 
 This endpoint will allow for the user login to the application and recive token if veryfication will be valid.
 
@@ -168,6 +170,7 @@ Get the list of policies' client paginated and limited to 10 elements by default
 
 ```
 Get /api/v1/policies
+```
 
 
 This endpoint will allow for the user recive policies data.
@@ -219,6 +222,7 @@ Get the details of a policy's client.
 
 ```
 Get /api/v1/policies/:id
+```
 
 This endpoint will allow for the user recive client policy details.
 
@@ -264,3 +268,425 @@ const getPoliciesById = async (req, res, next) => {
 
 #Clients
 
+Get the list of clients details paginated and limited to 10 elements by default also an optional filter query to filter by client name.
+
+```
+Get /api/v1/clients
+```
+
+* Query string
+
+```
+Get /api/v1/clients?limit=10&name=Britney
+```
+
+This endpoint will allow for the user recive clients details paginated separeted by roles.
+
+* User role.
+
+````csharp
+{
+        "id": "a3b8d425-2b60-4ad7-becc-bedf2ef860bd",
+        "name": "Barnett",
+        "email": "barnettblankenship@quotezart.com",
+        "role": "user",
+        "policie": []
+}
+````
+
+* Admin role.
+
+````csharp
+ {
+    "id": "a0ece5db-cd14-4f21-812f-966633e7be86",
+    "name": "Britney",
+    "email": "britneyblankenship@quotezart.com",
+    "role": "admin",
+    "policie": [
+        {
+            "id": "7b624ed3-00d5-4c1b-9ab8-c265067ef58b",
+            "amountInsured": "399.89",
+            "inceptionDate": "2015-07-06T06:55:49Z"
+        }
+    ]
+}
+````
+
+In folder `/src/controllers/clients.js` you can find middleware to this endpoint.
+
+````csharp
+//Get clients by roles and filter by query limit and name example URL:/api/v1/clients?limit=5&name=Manning
+const getClientsData = async (req, res, next) => {
+    try{
+        //After veryfication get role from request
+        const { role } = req.user;
+
+        //Get query data from query string
+        const { limit, name } = req.query;
+
+        //Consume Api and get clients data 
+        const data = await getClients();
+
+        //Consume Api and get policies data 
+        const dataPolicies = await getPolicies();
+
+        //Check is roles not exist throw 403 error 
+        if(!role) return res.status(403).send({message: 'Forbidden error'})
+
+        //Check condition if is true run code for user
+        if(role === "user"){
+
+            //Filter client data and return array with only users clients
+            const dataByRole = data.filter(user => user.role === role);
+
+            //For each user client check if exsit policies
+            dataByRole.map(user => {
+
+                //Array policies with objects inside
+                const objPolice = [];
+
+                //Filter policies data and return array policies if client id === user id 
+                const policies = dataPolicies.filter(u => u.clientId === user.id);
+
+                //Create new Array with data what is required
+                policies.map(p => {
+                     objPolice.push({
+                        id: p.id,
+                        amountInsured: p.amountInsured,
+                        inceptionDate: p.inceptionDate
+                    })
+                })
+                //Create value policie in user object and assign destructured Array
+                user.policie = [...objPolice];
+             })
+           
+            //Check if is query string
+            if(limit || name ){
+                //If is query string name filter users by name 
+                const findByName = name ? dataByRole.filter(user => user.name === name) : dataByRole;
+
+                //If is query string limit slice data to number of limits
+                const limitData = findByName ? findByName.slice(0, limit) : dataByRole.slice(0, 10);
+               
+                //If query string is true response 200 with data
+                return res.status(200).json(limitData);
+            }
+            //If endpoint is without query strings response with limit set by default 10 with status 200
+            const limitedByDefault = dataByRole.slice(0, 10);
+            return res.status(200).json(limitedByDefault);
+        }
+    
+        //Check condition if is true run code for admin
+        if(role === "admin"){
+
+            //For each user in Array set new vale with policies
+            data.map(user => {
+
+                //New Array with objects policies
+                const objPolice = [];
+
+                //Check data policies and filter with user id
+                const policies = dataPolicies.filter(u => u.clientId === user.id);
+
+                //For each policie retrive required values 
+                policies.map(p => {
+                    
+                    //Push values to new Array
+                    objPolice.push({
+                        id: p.id,
+                        amountInsured: p.amountInsured,
+                        inceptionDate: p.inceptionDate
+                    })
+                })
+                
+                //Create value policie in user object and assign destructured Array
+                user.policie = [...objPolice];
+             })
+
+            //Check if is query string
+            if(limit || name ){
+                
+                //If is query string name filter users by name 
+                const findByName = name ? data.filter(user => user.name === name) : data;
+                
+                //If is query string limit slice data to number of limits
+                const limitData = findByName ? findByName.slice(0, limit) : data.slice(0, 10);
+
+                //If query string is true response 200 with data
+                return res.status(200).json(limitData);
+            }
+          //If endpoint is without query strings response with status 200
+          return  res.status(200).json(data);
+
+        }
+    }catch(err){
+        //If is error send to handler error what is in /src/app.js
+        next(err);
+    }
+}
+````
+
+#Clients by ID
+
+Get the client's details
+
+```
+Get /api/v1/clients/:id
+```
+
+Can be accessed by client with role user and admin.
+
+* User role.
+
+````csharp
+    {
+        "id": "a3b8d425-2b60-4ad7-becc-bedf2ef860bd",
+        "name": "Barnett",
+        "email": "barnettblankenship@quotezart.com",
+        "role": "user",
+        "policies": []
+    }
+````
+
+* Admin role.
+
+````csharp
+ {
+    "id": "a0ece5db-cd14-4f21-812f-966633e7be86",
+    "name": "Britney",
+    "email": "britneyblankenship@quotezart.com",
+    "role": "admin",
+    "policie": [
+        {
+            "id": "7b624ed3-00d5-4c1b-9ab8-c265067ef58b",
+            "amountInsured": "399.89",
+            "inceptionDate": "2015-07-06T06:55:49Z"
+        }
+    ]
+}
+````
+
+In folder `/src/controllers/clients.js` you can find middleware to this endpoint.
+
+````csharp
+//Get clients by roles and by ID with policies example URL: /api/v1/clients/a0ece5db-cd14-4f21-812f-966633e7be86
+const getClientsById = async (req, res, next) => {
+    try{
+        //After veryfication get role from request
+        const { role } = req.user;
+
+        //Get client id from req.param
+        const { id } = req.params;
+
+        //Consume Api and get clients data 
+        const dataClient = await getClients();
+
+        //Consume Api and get policies data 
+        const dataPolicies = await getPolicies();
+
+        //Check is roles not exist throw 403 error
+        if(!role) return res.status(403).send({message: 'Forbidden error'})
+
+        //Check condition if is true run code for user
+        if(role === "user"){
+
+            //Filter client data and return array with only users clients
+            const dataByRole = dataClient.filter(user => user.role === role);
+            
+            //If role not exist in data base return 404
+            if(!dataByRole) return res.status(404).send({message: "Not Found error."});
+            
+            //Find client from data base by id 
+            const findClientById =  dataByRole.find(c => c.id === id);
+
+            //If client not exist in data base return 404
+            if(!findClientById) return res.status(404).send({message: "Not Found error."});
+
+                //Create new array for objects policies
+                const policies = []
+                
+                //Filter data policies and return by client id
+                const findPoliciesById =  dataPolicies.filter(c => c.clientId === id);
+
+                //Return new object data with value requeried
+                findPoliciesById.map(p => {
+
+                    policies.push({
+                        "id" : p.id,
+                        "amountInsured" : p.amountInsured,
+                        "inceptionDate": p.inceptionDate
+                    })
+                })
+
+                //Create value policie in user object and assign destructured Array
+                findClientById.policies = [...policies];
+
+                //Assing to client data new array policies with objects and return response status 200
+                const clientData = Object.assign([findClientById]);
+                return res.status(200).json(clientData);
+        }
+
+        //Check condition if is true run code for admin
+        if(role === "admin"){
+
+            //Find client from data base by id 
+            const findClientById =  dataClient.find(c => c.id === id);
+            
+            //If client not exist return 404 not found
+            if(!findClientById) return res.status(404).send({message: "Not Found error."});
+            
+            //Create new array for objects policies
+            const policies = []
+
+            //Filter data policies and return by client id
+            const findPoliciesById =  dataPolicies.filter(c => c.clientId === id);
+
+            //Return new object data with value requeried
+            findPoliciesById.map(p => {
+
+                policies.push({
+                    "id" : p.id,
+                    "amountInsured" : p.amountInsured,
+                    "inceptionDate": p.inceptionDate
+                })
+            })
+
+            //Create value policie in user object and assign destructured Array
+            findClientById.policies = [...policies];
+
+            //Assing to client data new array policies with objects and return response status 200
+            const clientData = Object.assign([findClientById]);
+            return res.status(200).json(clientData);
+            
+        }   
+    }catch(err){
+        //If is error send to handler error what is in /src/app.js
+        next(err);
+    }
+}
+
+````
+
+#Clients by ID and policies
+
+Get the client's policies
+
+```
+Get /api/v1/clients/:id/policies
+```
+
+Can be accessed by client with role user and admin.
+
+* User role.
+
+````csharp
+    {
+        [] //Empty array becuase any user dont have policices assign
+    }
+````
+
+* Admin role.
+
+````csharp
+ {
+        "id": "7b624ed3-00d5-4c1b-9ab8-c265067ef58b",
+        "amountInsured": "399.89",
+        "email": "inesblankenship@quotezart.com",
+        "inceptionDate": "2015-07-06T06:55:49Z",
+        "installmentPayment": true
+}
+````
+
+In folder `/src/controllers/clients.js` you can find middleware to this endpoint.
+
+````csharp
+//Get policies by client Id example URL:/api/v1/clients/a74c83c5-e271-4ecf-a429-d47af952cfd4/policies
+const getPoliciesByClientId = async (req, res, next) => {
+    try{
+        //After veryfication get role from request
+        const { role } = req.user;
+        
+        //Get client id from req.param
+        const { id } = req.params;
+
+        //Consume Api and get clients data 
+        const dataClient = await getClients();
+
+        //Consume Api and get policies data 
+        const dataPolicies = await getPolicies();
+
+        //Check is roles not exist throw 403 error
+        if(!role) return res.status(403).send({message: 'Forbidden error'})
+
+        //Check condition if is true run code for user
+        if(role === "user"){
+
+            //Filter client data and return array with only users clients
+            const dataByRole = dataClient.filter(user => user.role === role);
+
+            //If role not exist in data base return 404
+            if(!dataByRole) return res.status(404).send({message: "Not Found error."});
+           
+            //Create new array for objects policies
+            const policies = [];
+
+            //Find client from data base by id 
+            const getClientById = dataByRole.find(user => user.id === id);
+
+            //If client not exist in data base return 404
+            if(!getClientById) return res.status(404).send({message: "Not Found error."});
+
+            //Filter data policies and return by client id
+            const getPoliciesByClientId = dataPolicies.filter(policies => policies.clientId === getClientById.id);
+            
+            //Return new object data with value requeried
+            getPoliciesByClientId.map(policie => {
+                policies.push({
+                    "id": policie.id,
+                    "amountInsured": policie.amountInsured,
+                    "email": policie.email,
+                    "inceptionDate": policie.inceptionDate,
+                    "installmentPayment": policie.installmentPayment
+                })
+            })
+
+            //Return response with status 200 and policie
+            return res.status(200).send(policies);
+        }
+
+        //Check condition if is true run code for user
+        if(role === "admin"){
+
+            //Filter client data and return array with only users clients
+            const getClientById = dataClient.find(user => user.id === id);
+            
+            //If role not exist in data base return 404
+            if(!getClientById) return res.status(404).send({message: "Not Found error."});
+           
+            //Create new array for objects policies
+            const policies = [];
+            
+            //Filter data policies and return by client id
+            const getPoliciesByClientId = dataPolicies.filter(policies => policies.clientId === getClientById.id);
+            
+            //Return new object data with value requeried
+            getPoliciesByClientId.map(policie => {
+                policies.push({
+                    "id": policie.id,
+                    "amountInsured": policie.amountInsured,
+                    "email": policie.email,
+                    "inceptionDate": policie.inceptionDate,
+                    "installmentPayment": policie.installmentPayment
+                })
+            })
+
+            //Return response with status 200 and policie
+            return res.status(200).send(policies);
+        }
+
+    }catch(err){
+        //If is error send to handler error what is in /src/app.js
+        next(err);
+    }
+}
+````

@@ -2,7 +2,6 @@ const { getClients } = require('../actions');
 const { getPolicies }= require('../actions');
 
 
-
 //Get clients by roles and filter by query limit and name example URL:/api/v1/clients?limit=5&name=Manning
 const getClientsData = async (req, res, next) => {
     try{
@@ -33,10 +32,11 @@ const getClientsData = async (req, res, next) => {
            
             if(limit || name ){
                 const findByName = name ? dataByRole.filter(user => user.name === name) : dataByRole;
-                const limitData = findByName ? findByName.slice(0, limit) : dataByRole.slice(0, limit);
+                const limitData = findByName ? findByName.slice(0, limit) : dataByRole.slice(0, 10);
                
                 return res.status(200).json(limitData);
             }
+
             const limitedByDefault = dataByRole.slice(0, 10);
             return res.status(200).json(limitedByDefault);
         }
@@ -60,7 +60,7 @@ const getClientsData = async (req, res, next) => {
 
             if(limit || name ){
                 const findByName = name ? data.filter(user => user.name === name) : data;
-                const limitData = findByName ? findByName.slice(0, limit) : data.slice(0, limit);
+                const limitData = findByName ? findByName.slice(0, limit) : data.slice(0, 10);
 
                 return res.status(200).json(limitData);
             }
