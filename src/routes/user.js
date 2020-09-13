@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-const {login} = require('../auth');
+const {login} = require('../controllers/user');
 const {loginApi} = require('../actions');
 
 //User routes

@@ -29,4 +29,5 @@ app.use((err, req, res, next) => {
     res.status(500).send({ error: err.message })
 })
 
+//Export app to index.js for supertest
 module.exports = app;
