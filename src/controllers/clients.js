@@ -1,210 +1,203 @@
 const { getClients } = require('../actions');
-const { getPolicies }= require('../actions');
 
+const { getPolicies } = require('../actions');
 
 /**
- * 
+ *
  * CLIENT CONTROLLERS
- * 
- **/
+ *
+ * */
 
-
-//Get clients by roles and filter by query limit and name example URL:/api/v1/clients?limit=5&name=Manning
+// eslint-disable-next-line max-len
+//  Get clients by roles and filter by query limit and name example URL:/api/v1/clients?limit=5&name=Manning
+// eslint-disable-next-line consistent-return
 const getClientsData = async (req, res, next) => {
-    try{
-        const { role } = req.user;
-        const { limit, name } = req.query;
-        const data = await getClients();
-        const dataPolicies = await getPolicies();
+  try {
+    const { role } = req.user;
+    const { limit, name } = req.query;
+    const data = await getClients();
+    const dataPolicies = await getPolicies();
 
-        if(!role) return res.status(403).send({message: 'Forbidden error'})
+    if (!role) return res.status(403).send({ message: 'Forbidden error' });
 
-        if(role === "user"){
-            const dataByRole = data.filter(user => user.role === role);
+    if (role === 'user') {
+      const dataByRole = data.filter((user) => user.role === role);
 
-            dataByRole.map(user => {
-                const objPolice = [];
-                const policies = dataPolicies.filter(u => u.clientId === user.id);
+      // eslint-disable-next-line array-callback-return
+      dataByRole.map((user) => {
+        const objPolice = [];
+        const policies = dataPolicies.filter((u) => u.clientId === user.id);
 
-                policies.map(p => {
-                     objPolice.push({
-                        id: p.id,
-                        amountInsured: p.amountInsured,
-                        inceptionDate: p.inceptionDate
-                    })
-                })
+        policies.map((p) => objPolice.push({
+          id: p.id,
+          amountInsured: p.amountInsured,
+          inceptionDate: p.inceptionDate,
+        }));
 
-                user.policie = [...objPolice];
-             })
-           
-            if(limit || name ){
-                const findByName = name ? dataByRole.filter(user => user.name === name) : dataByRole;
-                const limitData = findByName ? findByName.slice(0, limit) : dataByRole.slice(0, 10);
-               
-                return res.status(200).json(limitData);
-            }
+        // eslint-disable-next-line no-param-reassign
+        user.policie = [...objPolice];
+      });
 
-            const limitedByDefault = dataByRole.slice(0, 10);
-            return res.status(200).json(limitedByDefault);
-        }
-    
-        if(role === "admin"){
+      if (limit || name) {
+        const findByName = name ? dataByRole.filter((user) => user.name === name) : dataByRole;
+        const limitData = findByName ? findByName.slice(0, limit) : dataByRole.slice(0, 10);
 
-            data.map(user => {
-                const objPolice = [];
-                const policies = dataPolicies.filter(u => u.clientId === user.id);
+        return res.status(200).json(limitData);
+      }
 
-                policies.map(p => {
-                    objPolice.push({
-                        id: p.id,
-                        amountInsured: p.amountInsured,
-                        inceptionDate: p.inceptionDate
-                    })
-                })
-
-                user.policie = [...objPolice];
-             })
-
-            if(limit || name ){
-                const findByName = name ? data.filter(user => user.name === name) : data;
-                const limitData = findByName ? findByName.slice(0, limit) : data.slice(0, 10);
-
-                return res.status(200).json(limitData);
-            }
-    
-          return  res.status(200).json(data);
-        }
-    }catch(err){
-        next(err);
+      const limitedByDefault = dataByRole.slice(0, 10);
+      return res.status(200).json(limitedByDefault);
     }
-}
 
-//Get clients by roles and by ID with policies example URL: /api/v1/clients/a0ece5db-cd14-4f21-812f-966633e7be86
+    if (role === 'admin') {
+      // eslint-disable-next-line array-callback-return
+      data.map((user) => {
+        const objPolice = [];
+        const policies = dataPolicies.filter((u) => u.clientId === user.id);
+
+        policies.map((p) => objPolice.push({
+          id: p.id,
+          amountInsured: p.amountInsured,
+          inceptionDate: p.inceptionDate,
+        }));
+
+        // eslint-disable-next-line no-param-reassign
+        user.policie = [...objPolice];
+      });
+
+      if (limit || name) {
+        const findByName = name ? data.filter((user) => user.name === name) : data;
+        const limitData = findByName ? findByName.slice(0, limit) : data.slice(0, 10);
+
+        return res.status(200).json(limitData);
+      }
+
+      return res.status(200).json(data);
+    }
+  } catch (err) {
+    next(err);
+  }
+};
+
+// eslint-disable-next-line max-len
+// Get clients by roles and by ID with policies example URL: /api/v1/clients/a0ece5db-cd14-4f21-812f-966633e7be86
+// eslint-disable-next-line consistent-return
 const getClientsById = async (req, res, next) => {
-    try{
-        const { role } = req.user;
-        const { id } = req.params;
-        const dataClient = await getClients();
-        const dataPolicies = await getPolicies();
+  try {
+    const { role } = req.user;
+    const { id } = req.params;
+    const dataClient = await getClients();
+    const dataPolicies = await getPolicies();
 
-        if(!role) return res.status(403).send({message: 'Forbidden error'})
+    if (!role) return res.status(403).send({ message: 'Forbidden error' });
 
-        if(role === "user"){
-            const dataByRole = dataClient.filter(user => user.role === role);
-            
-            if(!dataByRole) return res.status(404).send({message: "Not Found error."});
+    if (role === 'user') {
+      const dataByRole = dataClient.filter((user) => user.role === role);
 
-            const findClientById =  dataByRole.find(c => c.id === id);
+      if (!dataByRole) return res.status(404).send({ message: 'Not Found error.' });
 
-            if(!findClientById) return res.status(404).send({message: "Not Found error."});
+      const findClientById = dataByRole.find((c) => c.id === id);
 
-            const policies = []
-            const findPoliciesById =  dataPolicies.filter(c => c.clientId === id);
+      if (!findClientById) return res.status(404).send({ message: 'Not Found error.' });
 
-            findPoliciesById.map(p => {
+      const policies = [];
+      const findPoliciesById = dataPolicies.filter((c) => c.clientId === id);
 
-                policies.push({
-                    "id" : p.id,
-                    "amountInsured" : p.amountInsured,
-                    "inceptionDate": p.inceptionDate
-                })
-            })
+      findPoliciesById.map((p) => policies.push({
+        id: p.id,
+        amountInsured: p.amountInsured,
+        inceptionDate: p.inceptionDate,
+      }));
 
-            findClientById.policies = [...policies];
-            const clientData = Object.assign([findClientById]);
-            return res.status(200).json(clientData);
-        }
-
-        if(role === "admin"){
-            const findClientById =  dataClient.find(c => c.id === id);
-            
-            if(!findClientById) return res.status(404).send({message: "Not Found error."});
-            
-            const policies = []
-            const findPoliciesById =  dataPolicies.filter(c => c.clientId === id);
-
-            findPoliciesById.map(p => {
-
-                policies.push({
-                    "id" : p.id,
-                    "amountInsured" : p.amountInsured,
-                    "inceptionDate": p.inceptionDate
-                })
-            })
-
-            findClientById.policies = [...policies];
-            const clientData = Object.assign([findClientById]);
-            return res.status(200).json(clientData);
-            
-        }   
-    }catch(err){
-        next(err);
+      findClientById.policies = [...policies];
+      const clientData = Object.assign([findClientById]);
+      return res.status(200).json(clientData);
     }
-}
 
-//Get policies by client Id example URL:/api/v1/clients/a74c83c5-e271-4ecf-a429-d47af952cfd4/policies
+    if (role === 'admin') {
+      const findClientById = dataClient.find((c) => c.id === id);
+
+      if (!findClientById) return res.status(404).send({ message: 'Not Found error.' });
+
+      const policies = [];
+      const findPoliciesById = dataPolicies.filter((c) => c.clientId === id);
+
+      findPoliciesById.map((p) => policies.push({
+        id: p.id,
+        amountInsured: p.amountInsured,
+        inceptionDate: p.inceptionDate,
+      }));
+
+      findClientById.policies = [...policies];
+      const clientData = Object.assign([findClientById]);
+      return res.status(200).json(clientData);
+    }
+  } catch (err) {
+    next(err);
+  }
+};
+
+// eslint-disable-next-line max-len
+// Get policies by client Id example URL:/api/v1/clients/a74c83c5-e271-4ecf-a429-d47af952cfd4/policies
+// eslint-disable-next-line consistent-return
 const getPoliciesByClientId = async (req, res, next) => {
-    try{
-        const { role } = req.user;
-        const { id } = req.params;
-        const dataClient = await getClients();
-        const dataPolicies = await getPolicies();
+  try {
+    const { role } = req.user;
+    const { id } = req.params;
+    const dataClient = await getClients();
+    const dataPolicies = await getPolicies();
 
-        if(!role) return res.status(403).send({message: 'Forbidden error'})
+    if (!role) return res.status(403).send({ message: 'Forbidden error' });
 
-        if(role === "user"){
-            const dataByRole = dataClient.filter(user => user.role === role);
-           
-            if(!dataByRole) return res.status(404).send({message: "Not Found error."});
-           
-            const policies = [];
-            const getClientById = dataByRole.find(user => user.id === id);
+    if (role === 'user') {
+      const dataByRole = dataClient.filter((user) => user.role === role);
 
-            if(!getClientById) return res.status(404).send({message: "Not Found error."});
+      if (!dataByRole) return res.status(404).send({ message: 'Not Found error.' });
 
-            const getPoliciesByClientId = dataPolicies.filter(policies => policies.clientId === getClientById.id);
-            
-            getPoliciesByClientId.map(policie => {
-                policies.push({
-                    "id": policie.id,
-                    "amountInsured": policie.amountInsured,
-                    "email": policie.email,
-                    "inceptionDate": policie.inceptionDate,
-                    "installmentPayment": policie.installmentPayment
-                })
-            })
+      const policies = [];
+      const getClientById = dataByRole.find((user) => user.id === id);
 
-            return res.status(200).send(policies);
-        }
+      if (!getClientById) return res.status(404).send({ message: 'Not Found error.' });
 
-        if(role === "admin"){
-            const getClientById = dataClient.find(user => user.id === id);
-            
-            if(!getClientById) return res.status(404).send({message: "Not Found error."});
-           
-            const policies = [];
-            const getPoliciesByClientId = dataPolicies.filter(policies => policies.clientId === getClientById.id);
-            
-            getPoliciesByClientId.map(policie => {
-                policies.push({
-                    "id": policie.id,
-                    "amountInsured": policie.amountInsured,
-                    "email": policie.email,
-                    "inceptionDate": policie.inceptionDate,
-                    "installmentPayment": policie.installmentPayment
-                })
-            })
+      // eslint-disable-next-line max-len
+      const getPoliciesByClient = dataPolicies.filter((p) => p.clientId === getClientById.id);
 
-            return res.status(200).send(policies);
-        }
+      getPoliciesByClient.map((policie) => policies.push({
+        id: policie.id,
+        amountInsured: policie.amountInsured,
+        email: policie.email,
+        inceptionDate: policie.inceptionDate,
+        installmentPayment: policie.installmentPayment,
+      }));
 
-    }catch(err){
-        next(err);
+      return res.status(200).send(policies);
     }
-}
+
+    if (role === 'admin') {
+      const getClientById = dataClient.find((user) => user.id === id);
+
+      if (!getClientById) return res.status(404).send({ message: 'Not Found error.' });
+
+      const policies = [];
+      const getPoliciesByClient = dataPolicies.filter((p) => p.clientId === getClientById.id);
+
+      getPoliciesByClient.map((policie) => policies.push({
+        id: policie.id,
+        amountInsured: policie.amountInsured,
+        email: policie.email,
+        inceptionDate: policie.inceptionDate,
+        installmentPayment: policie.installmentPayment,
+      }));
+
+      return res.status(200).send(policies);
+    }
+  } catch (err) {
+    next(err);
+  }
+};
 
 module.exports = {
-    getClientsData,
-    getClientsById,
-    getPoliciesByClientId
-}
+  getClientsData,
+  getClientsById,
+  getPoliciesByClientId,
+};
